@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+
+/**
+ * 依赖的模块
+ */
+//是应用
+var app = require('../app');
+//日志服务
+var debug = require('debug')('201601blog:server');
+
+var http = require('http');
+
+/**
+ * 从环境变量中获得端口号并且保存在express中
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+//app也可以保存一些变量的值
+app.set('port', port);
+
+/**
+ * 创建http服务器
+ *  app 每当有请求到来的时候的回调函数
+ */
+
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ * 在端口号上进行监听
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * 当监听 成功的时候会调用此回调函数
+ */
+
+function onListening() {
+  var addr = server.address();//取得服务器的IP地址
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  //输出一行日志显示不显示取决于变量里的DEBUG参数
+  debug('Listening on ' + bind);
+}
